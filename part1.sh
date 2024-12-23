@@ -23,7 +23,7 @@ mount -o noatime,compress=zstd,ssd,discard=async,space_cache=v2,subvol=@var /dev
 mount -o noatime,ssd,space_cache=v2,subvol=@swap /dev/mapper/linuxroot /mnt/swap
 
 mkdir -p /mnt/efi
-mount -o /dev/nvme0n1p1 /mnt/efi
+mount /dev/nvme0n1p1 /mnt/efi
 
 iwctl
 reflector --country DK --age 24 --protocol http,https --sort rate --save /etc/pacman.d/mirrorlist
