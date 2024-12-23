@@ -1,6 +1,6 @@
 loadkeys dk
 
-fdisk /dev/nvme0n1p2
+fdisk /dev/nvme0n1
 
 cryptsetup luksFormat --type luks2 /dev/nvme0n1p2
 cryptsetup luksOpen /dev/nvme0n1p2 linuxroot
