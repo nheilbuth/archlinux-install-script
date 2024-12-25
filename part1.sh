@@ -32,8 +32,8 @@ mount -o noatime,compress=zstd,ssd,discard=async,space_cache=v2,subvol=@home /de
 mount -o noatime,compress=zstd,ssd,discard=async,space_cache=v2,subvol=@var /dev/mapper/linuxroot /mnt/var
 mount -o noatime,ssd,space_cache=v2,subvol=@swap /dev/mapper/linuxroot /mnt/swap
 
-mkdir -p /mnt/boot
-mount /dev/nvme0n1p1 /mnt/boot
+mkdir -p /mnt/efi
+mount /dev/nvme0n1p1 /mnt/efi
 
 echo "updating pacman"
 reflector --country DK --age 24 --protocol http,https --sort rate --save /etc/pacman.d/mirrorlist
@@ -61,7 +61,7 @@ clear
 
 echo "setting up efi"
 echo "quiet rw" >/mnt/etc/kernel/cmdline
-mkdir -p /mnt/boot/EFI/Linux
+mkdir -p /mnt/efi/EFI/Linux
 vim /mnt/etc/mkinitcpio.conf #(remove: udev keymap consolefont, add: systemd sd-vconsole sd-encrypt resume, move: keyboard before autodetect)
 vim /mnt/etc/mkinitcpio.d/linux.preset #(comment out: 9,14, remove comment: 3,10,11,15)
 arch-chroot /mnt mkinitcpio -P
@@ -71,7 +71,7 @@ echo "settup up bootloader"
 # SYSTEMD 
 systemctl --root /mnt enable systemd-resolved systemd-timesyncd NetworkManager
 systemctl --root /mnt mask systemd-networkd
-arch-chroot /mnt bootctl install --esp-path=/boot
+arch-chroot /mnt bootctl install --esp-path=/efi
 #sync
 #reboot
 
