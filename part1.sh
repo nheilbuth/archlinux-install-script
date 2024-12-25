@@ -17,15 +17,21 @@ mkfs.btrfs -f -L linuxroot /dev/mapper/linuxroot
 
 echo "mounting"
 mount /dev/mapper/linuxroot /mnt
-mkdir /mnt/efi
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@home
+btrfs subvolume create /mnt/@var
+btrfs subvolume create /mnt/@swap
+umount /mnt
+mount -o noatime,compress=zstd,ssd,discard=async,space_cache=v2,subvol=@ /dev/mapper/linuxroot /mnt
+mkdir -p /mnt/home
+mkdir -p /mnt/var
+mkdir -p /mnt/swap
+mount -o noatime,compress=zstd,ssd,discard=async,space_cache=v2,subvol=@home /dev/mapper/linuxroot /mnt/home
+mount -o noatime,compress=zstd,ssd,discard=async,space_cache=v2,subvol=@var /dev/mapper/linuxroot /mnt/var
+mount -o noatime,ssd,space_cache=v2,subvol=@swap /dev/mapper/linuxroot /mnt/swap
+
+mkdir -p /mnt/efi
 mount /dev/nvme0n1p1 /mnt/efi
-btrfs subvolume create /mnt/home
-btrfs subvolume create /mnt/srv
-btrfs subvolume create /mnt/var
-btrfs subvolume create /mnt/var/log
-btrfs subvolume create /mnt/var/cache
-btrfs subvolume create /mnt/var/tmp
-btrfs subvolume create /mnt/swap
 
 echo "updating pacman"
 reflector --country DK --age 24 --protocol http,https --sort rate --save /etc/pacman.d/mirrorlist
