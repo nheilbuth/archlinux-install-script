@@ -37,10 +37,12 @@ echo "updating pacman"
 reflector --country DK --age 24 --protocol http,https --sort rate --save /etc/pacman.d/mirrorlist
 pacman -Sy
 pacstrap -K /mnt base base-devel linux linux-firmware intel-ucode vim cryptsetup btrfs-progs dosfstools util-linux git sbctl networkmanager sudo iwd
+genfstab -U -p /mnt >> /mnt/etc/fstab
 clear 
 
 echo "set locales"
-sed -i -e "/^#"en_DK.UTF-8"/s/^#//" /mnt/etc/locale.gen
+# sed -i -e "/^#"en_DK.UTF-8"/s/^#//" /mnt/etc/locale.gen
+echo "heilbuth ALL=(ALL:ALL) ALL" >> /mnt/etc/sudoers.d/heilbuth
 systemd-firstboot --root /mnt --prompt
 arch-chroot /mnt locale-gen
 
