@@ -32,13 +32,13 @@ mount -o noatime,compress=zstd,ssd,discard=async,space_cache=v2,subvol=@home /de
 mount -o noatime,compress=zstd,ssd,discard=async,space_cache=v2,subvol=@var /dev/mapper/linuxroot /mnt/var
 mount -o noatime,ssd,space_cache=v2,subvol=@swap /dev/mapper/linuxroot /mnt/swap
 
-mkdir -p /mnt/efi
-mount /dev/nvme0n1p1 /mnt/efi
+mkdir -p /mnt/boot
+mount /dev/nvme0n1p1 /mnt/boot
 
 echo "updating pacman"
 reflector --country DK --age 24 --protocol http,https --sort rate --save /etc/pacman.d/mirrorlist
 pacman -Sy
-pacstrap -K /mnt base base-devel linux linux-firmware intel-ucode vim cryptsetup btrfs-progs dosfstools util-linux git sbctl networkmanager sudo iwd
+pacstrap /mnt base base-devel linux linux-firmware intel-ucode vim cryptsetup btrfs-progs dosfstools util-linux git sbctl networkmanager sudo iwd efibootmgr grub-btrfs
 genfstab -U -p /mnt >> /mnt/etc/fstab
 clear 
 
@@ -60,16 +60,19 @@ echo "heilbuth ALL=(ALL:ALL) ALL" >> /mnt/etc/sudoers.d/heilbuth
 clear 
 
 echo "setting up efi"
-echo "quiet rw" >/mnt/etc/kernel/cmdline
-mkdir -p /mnt/efi/EFI/Linux
+#echo "quiet rw" >/mnt/etc/kernel/cmdline
+#mkdir -p /mnt/boot/EFI/Linux
 vim /mnt/etc/mkinitcpio.conf #(remove: udev keymap consolefont, add: systemd sd-vconsole sd-encrypt resume, move: keyboard before autodetect)
-vim /mnt/etc/mkinitcpio.d/linux.preset #(comment out: 9,14, remove comment: 3,10,11,15)
+#vim /mnt/etc/mkinitcpio.d/linux.preset #(comment out: 9,14, remove comment: 3,10,11,15)
 arch-chroot /mnt mkinitcpio -P
 clear 
 
-echo "setting up services"
+echo "settup up bootloader"
+# SYSTEMD 
 #systemctl --root /mnt enable systemd-resolved systemd-timesyncd NetworkManager
 #systemctl --root /mnt mask systemd-networkd
 #arch-chroot /mnt bootctl install --esp-path=/efi
 #sync
 #reboot
+
+# GRUB
