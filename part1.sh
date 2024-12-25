@@ -17,10 +17,12 @@ mkfs.btrfs -f -L linuxroot /dev/mapper/linuxroot
 
 echo "mounting"
 mount /dev/mapper/linuxroot /mnt
+cd /mnt
 btrfs subvolume create @
 btrfs subvolume create @home
 btrfs subvolume create @var
 btrfs subvolume create @swap
+cd ~
 umount /mnt
 mount -o noatime,compress=zstd,ssd,discard=async,space_cache=v2,subvol=@ /dev/mapper/linuxroot /mnt
 mkdir -p /mnt/home
@@ -41,19 +43,20 @@ genfstab -U -p /mnt >> /mnt/etc/fstab
 clear 
 
 echo "set locales"
-# sed -i -e "/^#"en_DK.UTF-8"/s/^#//" /mnt/etc/locale.gen
-echo "heilbuth ALL=(ALL:ALL) ALL" >> /mnt/etc/sudoers.d/heilbuth
+sed -i -e "/^#"en_DK.UTF-8"/s/^#//" /mnt/etc/locale.gen
 systemd-firstboot --root /mnt --prompt
 arch-chroot /mnt locale-gen
 
-echo "add user"
-arch-chroot /mnt useradd -G wheel -m heilbuth
-echo "choose password for user"
-arch-chroot /mnt passwd heilbuth
-sed -i -e '/^# %wheel ALL=(ALL:ALL) ALL/s/^# //' /mnt/etc/sudoers
 clear 
 echo "set root password"
 arch-chroot /mnt passwd
+clear 
+echo "add user"
+arch-chroot /mnt useradd -G wheel -m heilbuth
+echo "choose password for user heilbuth"
+arch-chroot /mnt passwd heilbuth
+#sed -i -e '/^# %wheel ALL=(ALL:ALL) ALL/s/^# //' /mnt/etc/sudoers
+echo "heilbuth ALL=(ALL:ALL) ALL" >> /mnt/etc/sudoers.d/heilbuth
 clear 
 
 echo "setting up efi"
@@ -65,8 +68,8 @@ arch-chroot /mnt mkinitcpio -P
 clear 
 
 echo "setting up services"
-systemctl --root /mnt enable systemd-resolved systemd-timesyncd NetworkManager
-systemctl --root /mnt mask systemd-networkd
-arch-chroot /mnt bootctl install --esp-path=/efi
-sync
-reboot
+#systemctl --root /mnt enable systemd-resolved systemd-timesyncd NetworkManager
+#systemctl --root /mnt mask systemd-networkd
+#arch-chroot /mnt bootctl install --esp-path=/efi
+#sync
+#reboot
