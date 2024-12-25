@@ -17,10 +17,10 @@ mkfs.btrfs -f -L linuxroot /dev/mapper/linuxroot
 
 echo "mounting"
 mount /dev/mapper/linuxroot /mnt
-btrfs subvolume create /mnt/@
-btrfs subvolume create /mnt/@home
-btrfs subvolume create /mnt/@var
-btrfs subvolume create /mnt/@swap
+btrfs subvolume create @
+btrfs subvolume create @home
+btrfs subvolume create @var
+btrfs subvolume create @swap
 umount /mnt
 mount -o noatime,compress=zstd,ssd,discard=async,space_cache=v2,subvol=@ /dev/mapper/linuxroot /mnt
 mkdir -p /mnt/home
