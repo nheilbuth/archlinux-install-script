@@ -38,7 +38,7 @@ mount /dev/nvme0n1p1 /mnt/efi
 echo "updating pacman"
 reflector --country DK --age 24 --protocol http,https --sort rate --save /etc/pacman.d/mirrorlist
 pacman -Sy
-pacstrap /mnt base base-devel linux linux-firmware intel-ucode vim cryptsetup btrfs-progs dosfstools util-linux git sbctl networkmanager sudo
+pacstrap /mnt base base-devel linux linux-lts linux-firmware intel-ucode vim cryptsetup btrfs-progs dosfstools util-linux git sbctl networkmanager sudo
 genfstab -U -p /mnt >> /mnt/etc/fstab
 clear 
 
