@@ -69,5 +69,10 @@ vim /mnt/etc/mkinitcpio.d/linux-lts.preset #(comment out: 9,14, remove comment: 
 systemctl --root /mnt enable systemd-resolved systemd-timesyncd NetworkManager
 systemctl --root /mnt mask systemd-networkd
 arch-chroot /mnt bootctl install --esp-path=/efi
-arch-chroot /mnt vim /etc/kernel/cmdline # Add kernel parameters for boot device/subvolume https://eldon.me/arch-linux-laptop-setup/ 
+#arch-chroot /mnt vim /etc/kernel/cmdline # Add kernel parameters for boot device/subvolume https://eldon.me/arch-linux-laptop-setup/ 
+echo "rd.luks.name=$(blkid | grep crypto_LUKS | grep -Po '\bUUID=".*?"' | sed 's/UUID=//' | tr -d '"')=top" | tee -a /mnt/etc/kernel/cmdline  # get LUKS UUID and copy it to /etc/kernel/cmdline in new system
+echo "root=$(blkid | grep /dev/mapper/top | grep -Po '\bUUID=".*?"')" | tee -a /mnt/etc/kernel/cmdline
+arch-chroot /mnt vim /etc/kernel/cmdline #add rootflags=subvol=@
+
+arch-chroot /mnt mkinitcpio -p linux
 arch-chroot /mnt mkinitcpio -p linux-lts
