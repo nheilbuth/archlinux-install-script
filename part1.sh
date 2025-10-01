@@ -1,5 +1,6 @@
 loadkeys dk
 
+blkdiscard -v /dev/nvme0n1
 fdisk /dev/nvme0n1
 clear
 
