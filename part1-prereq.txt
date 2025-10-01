@@ -1,3 +1,6 @@
 iwctl 
   -> station wlan0 scan
   -> station wlan0 connect SSID
+
+pacman -S git
+git clone https://github.com/nheilbuth/archlinux-install-script
