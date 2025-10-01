@@ -64,15 +64,15 @@ clear
 echo "setting up efi/bootloader"
 echo "quiet rw" >/mnt/etc/kernel/cmdline
 mkdir -p /mnt/efi/EFI/Linux
-vim /mnt/etc/mkinitcpio.conf #(remove: udev keymap consolefont, add: systemd sd-vconsole sd-encrypt resume, move: keyboard before autodetect)
-vim /mnt/etc/mkinitcpio.d/linux-lts.preset #(comment out: 9,14, remove comment: 3,10,11,15)
+vim /mnt/etc/mkinitcpio.conf # remove: udev keymap consolefont, add: systemd sd-vconsole sd-encrypt resume, move: keyboard before autodetect
+vim /mnt/etc/mkinitcpio.d/linux-lts.preset # comment out: 9,14, remove comment: 3,10,11,15 (maybe wait with 15)
 systemctl --root /mnt enable systemd-resolved systemd-timesyncd NetworkManager
 systemctl --root /mnt mask systemd-networkd
 arch-chroot /mnt bootctl install --esp-path=/efi
 #arch-chroot /mnt vim /etc/kernel/cmdline # Add kernel parameters for boot device/subvolume https://eldon.me/arch-linux-laptop-setup/ 
 echo "rd.luks.name=$(blkid | grep crypto_LUKS | grep -Po '\bUUID=".*?"' | sed 's/UUID=//' | tr -d '"')=top" | tee -a /mnt/etc/kernel/cmdline  # get LUKS UUID and copy it to /etc/kernel/cmdline in new system
 echo "root=$(blkid | grep /dev/mapper/top | grep -Po '\bUUID=".*?"')" | tee -a /mnt/etc/kernel/cmdline
-arch-chroot /mnt vim /etc/kernel/cmdline #add rootflags=subvol=@
+echo "rootflags=subvol=@" | tee -a /mnt/etc/kernel/cmdline
 
 arch-chroot /mnt mkinitcpio -p linux
 arch-chroot /mnt mkinitcpio -p linux-lts
